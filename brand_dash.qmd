@@ -40,8 +40,8 @@ showtext_auto()
 #| label: load-data
 #| message: false
 
-items<-read.csv("C:/Users/Nicola/Desktop/Nicola/Università/big data/prova_Big_Data_Novembre_2019/items.csv", h=T, stringsAsFactors = FALSE)
-reviews<-read.csv("C:/Users/Nicola/Desktop/Nicola/Università/big data/prova_Big_Data_Novembre_2019/reviews.csv", h=T, stringsAsFactors = FALSE)
+items<-read.csv("items.csv", h=T, stringsAsFactors = FALSE)
+reviews<-read.csv("reviews.csv", h=T, stringsAsFactors = FALSE)
 
 
 df<-items%>%
