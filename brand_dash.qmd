@@ -1,0 +1,229 @@
+---
+title: "Brand Dashboard"
+format: dashboard
+    nav-buttons: [github]
+    github: https://github.com/NicolaRizzitello/Brand_Dashboard
+logo: C:/Users/Nicola/Desktop/R_quarto/dash_brand/images/articolo-public.png
+theme: [sandstone, C:/Users/Nicola/Desktop/R_quarto/dash_brand/theme/custom.scss]
+fig-width: 10
+fig-asp: 0.3
+params:
+  month: "October"
+  year: "2023"
+  # 2021 rates: https://www.cdc.gov/nchs/data/nvsr/nvsr72/nvsr72-01.pdf
+  us_cesarean_rate: 0.321 
+  us_preterm_rate:  0.1049
+  threshold_diff: 0.02
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: load-packages
+#| message: false
+
+library(tidyverse)
+library(readxl)
+library(lubridate)
+library(sqldf)
+library(scales)
+library(DT)
+library(gt)
+library(plotly)
+library(showtext)
+theme_set(theme_minimal(base_size = 24, base_family = "Atkinson Hyperlegible"))
+font_add_google("Montserrat")
+showtext_auto()
+```
+
+```{r}
+#| label: load-data
+#| message: false
+
+items<-read.csv("C:/Users/Nicola/Desktop/Nicola/Università/big data/prova_Big_Data_Novembre_2019/items.csv", h=T, stringsAsFactors = FALSE)
+reviews<-read.csv("C:/Users/Nicola/Desktop/Nicola/Università/big data/prova_Big_Data_Novembre_2019/reviews.csv", h=T, stringsAsFactors = FALSE)
+
+
+df<-items%>%
+  inner_join(reviews, c("asin"="asin"))
+df <- subset(df, select = -c(url, image, reviewUrl))
+```
+
+#  {.sidebar}
+
+This dashboard displays statistics for brand's reviews. 
+This dataset is composed by 82815 observations and 9 columns:
+
+| Column name | Description                                                                      
+|-----------------------------|-------------------------------------------|
+| **Asin**  | Unique ID 
+| **Brand** | Brand Device
+| **Rating**| Average device rate
+| **Title** | Device Name
+| **Total Reviews** | Total of reviews about that device
+| **Prices**| Device price
+| **Date**  | Date reviews
+| **Body**  | Content review
+| **Name**  | Name of person who wrote the review
+
+------------------------------------------------------------------------
+
+From 2004 to 2019, top three brands with the most reviews :
+
+|              |       |
+|--------------|-------|
+| **Samsung**  | 41773 |
+| **Apple**    | 12015 |
+| **Motorola** | 8842  |
+
+------------------------------------------------------------------------
+
+# Data
+
+```{r}
+df_sub<-df %>% 
+  select(brand, totalReviews, name,prices, date, rating.y)
+df_sub %>% 
+  datatable(
+    colnames = c("Brand", "Total Reviews", "Name", "Prices", "Date", "Votes"),
+    options = list(dom = 'ftp', paging = TRUE)
+    )
+```
+
+# Brands Analysis
+
+### Column {height="50%"}
+
+```{r}
+n <- length(df$brand)##DIMENSIONE VARIABILE BRAND
+brand<-df%>%
+  group_by(brand)%>%
+  summarise(n=(n()/n))##CALCOLO DISTRIBUZIONE DI FREQUENZA RELATIVA
+ 
+p_1 <- ggplot(brand, aes(x = reorder(brand, -n), y=n, fill=brand))
+
+p_1 <- p_1 + geom_bar(stat = "identity") +
+  labs(title = "Brand Devices Percentage")+ ylab("Percentage")+
+  xlab("Brands") + scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_brewer(palette = "Paired",name = "Brand") + scale_y_continuous(labels = scales::percent) + theme_minimal()+theme(text=element_text(size=20, face =     "bold",family="Montserrat"))+theme(legend.position="none")
+
+p_1
+```
+
+### Columns {height="50%"}
+
+```{r}
+
+p_2 <- ggplot(data = df) +
+  geom_boxplot(aes(x=brand,y=rating.x, fill = brand)) + labs(title = "Brand Devices Rates")+    
+  ylab("Rate")+
+  xlab("Brands") + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_brewer(palette = "Paired") + theme_minimal()+theme(text=element_text(size=20,face =     "bold",family="Montserrat"))+theme(legend.position="none")
+
+p_2
+```
+# Price distributions
+
+### Column {height="50%"}
+
+```{r}
+df$prices<-gsub("^.{0,1}","",df$prices)###ELIMINO SIMBOLO DOLLARO DALLA VARIABILE PRICES
+df$prices<- as.numeric(df$prices)###TRASFORMO LA VARIABILE PRICES IN NUMERIC 
+
+p_4<-ggplot(data = df)  + 
+  geom_boxplot(aes(x = brand , y = prices, fill = brand))  + 
+  labs(title="Distribution of prices by brand", x="Brand", y="Price")+
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_brewer(palette = "Paired") + theme_minimal()+theme(text=element_text(size=20,family="Montserrat", face = "bold"))+theme(legend.position="none")###RAPPRESENTAZIONE GRAFICA DEI PREZZI PER BRAND
+
+p_4
+
+```
+
+
+# Reviews Distribution 
+
+
+### Column {height="50%"}
+
+```{r}
+options(scipen=999)
+df$date<-mdy(df$date)###TRASFORMAZIONE VARIABILE DATA
+
+df<-mutate(df, year = year(date))###CREAZIONE VARIBILE YEAR
+
+d_b_r<-df%>%
+  select(year,brand,totalReviews)%>%
+  filter(year>="2014")###SELZIONI LE VARIBILI NECESSARIE PER L'ANALISI E FILTRO RISPETTO AL 2014
+
+d_b_r<-d_b_r%>%
+  group_by(year,brand)%>%
+  summarise(tot_rev=sum(totalReviews))##CALCOLO TOTALE DELLE REVIEWS PER ANNO E PER BRAND
+
+p_5<-ggplot(data=d_b_r,aes(x=year,y=tot_rev, color = brand))+
+  geom_line(linewidth=1)+
+  scale_color_manual(values = c("#A6CEE3" ,"#1F78B4" ,"#B2DF8A" ,"#33A02C" ,"#FB9A99" ,"#E31A1C", "#FDBF6F","#FF7F00" ,"#CAB2D6","#6A3D9A")) +
+  labs(title="Distribution reviews by year",x="Year", y = "Totale review")+
+  theme_minimal()+theme(text=element_text(size=20, face =     "bold",family="Montserrat"))+theme(legend.position="none")
+
+p_5
+```
+
+### Column {height="50%"}
+
+```{r}
+
+r_t<-df%>%
+  select(asin, title.x, totalReviews, brand)###SELEZIONE DELLE VARIABILI NECESSARIE PER L'ANALISI
+
+r_t_n<-r_t%>%
+  group_by(brand)%>%
+  summarise(max=max(totalReviews))###CALCOLO DEL MASSIMO DI REVIEWS OTTENUTE DA UN TELEFONINO PER BRAND
+r_t_n<-r_t_n[order(-r_t_n$max),]###ORDINAMENTO DECRESCENTE DEL DATASET 
+
+##CREAZIONE VARIABILE MODELLO TELEFONINO###
+tel <- c("Google Pixel XL (Google)","Samsung Galaxy Note 3","Apple iPhone 6","Motorola Moto X (XT1058)","Dual-Band (Nokia)","Huawei Mate 10 Pro","Xiaomi Redmi Note 5","Sony Xperia XA", "OnePlus 2 A2005","ASUS ZenFone Max Plus" )
+t <- cbind(r_t_n, tel)###CREAZIONE NUOVO DATASET  
+
+
+r_b<-df%>%
+  group_by(brand)%>%
+  summarise(n=n())###CALCOLO TOTALE REVIEWS PER BRAND
+
+p_3 <- ggplot(r_t_n, aes(x = reorder(tel, -max), y = max,fill=tel))+geom_bar(stat = "identity") +
+  labs(title="No. reviews by devices", x="Device", y="Frequency")+
+  xlab("Device") + scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_brewer(palette = "Paired") + theme_minimal()+theme(text=element_text(size=20, face =     "bold",family="Montserrat"))+theme(legend.position="none")
+
+p_3
+```
+
+# Words distribution
+### Column {height = "50%"}
+```{r}
+camera<-sqldf("SELECT brand, body FROM df WHERE body like '%camera%'")###REVIEWS PER BRAND CON LA PAROLA CAMERA
+battery<-sqldf("SELECT brand, body FROM df WHERE body like '%battery%'")###REVIEWS PER BRAND CON LA PAROLA BATTERY
+screen<-sqldf("SELECT brand, body FROM df WHERE body like '%screen%'")###REVIEWS PER BRAND CON LA PAROLA SCREEN
+
+s<-screen%>%group_by(brand)%>%summarise(n=n())###CALCOLO DELLE DISTRIBUZIONI DI FREQUENZA PER LA PAROLA SCREEN
+sc <- rep(c("screen"), 10)
+s <- s %>%
+  mutate(word=sc)
+c<-camera%>%group_by(brand)%>%summarise(n=n())###CALCOLO DELLE DISTRIBUZIONI DI FREQUENZA PER LA PAROLA CAMERA
+ca <- rep(c("camera"), 10)
+c <- c %>%
+  mutate(word=ca)
+b<-battery%>%group_by(brand)%>%summarise(n=n())###CALCOLO DELLE DISTRIBUZIONI DI FREQUENZA PER LA PAROLA BATTERY
+ba <- rep(c("battery"), 10)
+b <- b %>%
+  mutate(word=ba)
+
+csb<-rbind(c,s,b)
+p_6<-ggplot(csb) + geom_bar(aes(x = reorder(brand,-n), y=n,fill = word), stat = "identity")+
+  labs(title="Distribution of words screen, camera and battery by brand", x="Brand", y="Frequency")+
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  scale_fill_brewer(palette = "Paired") + theme_minimal()+theme(text=element_text(size=20, face =     "bold",family="Montserrat"))
+
+p_6
+```
