@@ -1,8 +1,6 @@
 ---
 title: "Brand Dashboard"
 format: dashboard
-    nav-buttons: [github]
-    github: https://github.com/NicolaRizzitello/Brand_Dashboard
 logo: C:/Users/Nicola/Desktop/R_quarto/dash_brand/images/articolo-public.png
 theme: [sandstone, C:/Users/Nicola/Desktop/R_quarto/dash_brand/theme/custom.scss]
 fig-width: 10
