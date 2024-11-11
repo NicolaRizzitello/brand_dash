@@ -1,13 +1,12 @@
-# Dashboard using Quarto in R
+# Quarto/Rmarkdown <img src="featured.png" align="right" height="130"  alt="" />
 
 
-## **This repository contains very simple code to create a dashboard with R using Quarto**
+### **Create a dashboard with R using Quarto**
 
-You must have a RStudio v2022.07.1 or a later version to render this prohject.
+> You must have a RStudio v2022.07.1 or a later version to render this prohject.
+> To upgrade Quarto out of sync with the bundled version in RStudio, follow the directions at https://quarto.org/docs/download/
 
-To upgrade Quarto out of sync with the bundled version in RStudio, follow the directions at https://quarto.org/docs/download/
 
----------------------------------------------------------
 
 ### About the Dataset
 
@@ -20,7 +19,7 @@ It's important to merge our two dataset in one.
 Merging data we obtain one dataset composed by 82815 observations and 16 columns.  
 We will select some columns to create the dashboard.
 
-These are the columns
+These are the columns:
 
 | Column name | Description                                                                      
 |-----------------------------|-------------------------------------------|
