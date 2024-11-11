@@ -1,4 +1,4 @@
-# Quarto/Rmarkdown <img src="featured.png" align="right" height="130"  alt="" />
+# Quarto/Rmarkdown/R <img src="featured.png" align="right" height="130"  alt="" />
 
 
 ### **Create a dashboard with R using Quarto**
