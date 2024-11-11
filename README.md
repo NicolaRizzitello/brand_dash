@@ -38,4 +38,4 @@ These are the columns:
 
 This is my personal dashboard to get informations from this dataset. You can clone this repo and do what you want.
 
-**ENJOY!**
+# **<p align=center>ENJOY!**
