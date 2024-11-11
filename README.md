@@ -1,10 +1,13 @@
 # Dashboard using Quarto in R
 
+
 ## **This repository contains very simple code to create a dashboard with R using Quarto**
 
 You must have a RStudio v2022.07.1 or a later version to render this prohject.
 
 To upgrade Quarto out of sync with the bundled version in RStudio, follow the directions at https://quarto.org/docs/download/
+
+---------------------------------------------------------
 
 ### About the Dataset
 
