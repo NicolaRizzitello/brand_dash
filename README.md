@@ -3,7 +3,7 @@
 
 ### **Create a dashboard with R using Quarto**
 
-> You must have a RStudio v2022.07.1 or a later version to render this prohject.
+> You must have a RStudio v2022.07.1 or a later version to render this project.
 > To upgrade Quarto out of sync with the bundled version in RStudio, follow the directions at https://quarto.org/docs/download/
 
 
