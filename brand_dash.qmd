@@ -36,8 +36,8 @@ showtext_auto()
 #| title: load-data
 #| message: false
 
-items<-read.csv("C:/Users/nrizzitello/Desktop/R_quarto/dash_brand/items.csv", h=T, stringsAsFactors = FALSE)
-reviews<-read.csv("C:/Users/nrizzitello/Desktop/R_quarto/dash_brand/reviews.csv", h=T, stringsAsFactors = FALSE)
+items<-read.csv("items.csv", h=T, stringsAsFactors = FALSE)
+reviews<-read.csv("reviews.csv", h=T, stringsAsFactors = FALSE)
 
 
 df<-items%>%
